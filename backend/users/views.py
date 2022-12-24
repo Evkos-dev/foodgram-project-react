@@ -16,10 +16,10 @@ class CreateDestroyViewSet(
     pass
 
 
-class CustomUserViewSet(UserViewSet):
-    queryset = User.objects.all()
-    serializer_class = CustomUserSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+# class CustomUserViewSet(UserViewSet):
+#     queryset = User.objects.all()
+#     serializer_class = CustomUserSerializer
+#     permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 class FollowViewSet(CreateDestroyViewSet):
