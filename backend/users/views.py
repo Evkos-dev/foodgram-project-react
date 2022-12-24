@@ -1,11 +1,7 @@
 from api.pagination import CustomPagination
-from djoser.views import UserViewSet
 from rest_framework import filters, mixins, viewsets
-from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
-from users.models import User
-from users.serializers import (CustomUserSerializer, FollowingSerializer,
-                               FollowSerializer)
+from rest_framework.permissions import IsAuthenticated
+from users.serializers import FollowingSerializer, FollowSerializer
 
 
 class CreateDestroyViewSet(
