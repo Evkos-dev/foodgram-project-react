@@ -12,12 +12,6 @@ class CreateDestroyViewSet(
     pass
 
 
-# class CustomUserViewSet(UserViewSet):
-#     queryset = User.objects.all()
-#     serializer_class = CustomUserSerializer
-#     permission_classes = [IsAuthenticatedOrReadOnly]
-
-
 class FollowViewSet(CreateDestroyViewSet):
     serializer_class = FollowSerializer
     filter_backends = (filters.SearchFilter,)
