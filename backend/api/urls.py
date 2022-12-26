@@ -10,4 +10,5 @@ router.register(r"recipes", RecipeViewSet, basename="recipes")
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("users/", include("users.urls")),
 ]
