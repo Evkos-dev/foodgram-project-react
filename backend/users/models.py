@@ -41,3 +41,6 @@ class Follow(models.Model):
                 name='cant_follow_urself'
             )
         ]
+
+    def __str__(self):
+        return f'{self.user} follows {self.following}'

@@ -1,7 +1,7 @@
 from djoser.serializers import UserSerializer
-from recipes.models import Recipe
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
+
+from recipes.models import Recipe
 from users.models import Follow, User
 
 
@@ -19,14 +19,17 @@ class CustomUserSerializer(UserSerializer):
             'username',
             'first_name',
             'last_name',
-            'is_subscribed',
+            'is_subscribed'
         )
 
     def get_is_subscribed(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
+        request = self.context.get('request')
+        if request is None or request.user.is_anonymous:
             return False
-        return Follow.objects.filter(user=user, author=obj).exists()
+        return Follow.objects.filter(
+            user=request.user,
+            following=obj
+        ).exists()
 
 
 class ShortRecipeSerializer(serializers.ModelSerializer):
@@ -38,41 +41,12 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
-class FollowSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='username',
-        default=serializers.CurrentUserDefault()
-    )
-    following = serializers.SlugRelatedField(
-        slug_field='username',
-        queryset=User.objects.all()
-    )
-
-    class Meta:
-        model = Follow
-        fields = '__all__'
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Follow.objects.all(),
-                fields=('user', 'following')
-            )
-        ]
-
-    def validate(self, data):
-        if data['following'] == self.context['request'].user:
-            raise serializers.ValidationError(
-                'Вы не можете подписаться на себя!'
-            )
-        return data
-
-
 class FollowingSerializer(serializers.ModelSerializer):
-    email = serializers.ReadOnlyField(source='author.email')
-    id = serializers.ReadOnlyField(source='author.id')
-    username = serializers.ReadOnlyField(source='author.username')
-    first_name = serializers.ReadOnlyField(source='author.first_name')
-    last_name = serializers.ReadOnlyField(source='author.last_name')
+    email = serializers.ReadOnlyField(source='following.email')
+    id = serializers.ReadOnlyField(source='following.id')
+    username = serializers.ReadOnlyField(source='following.username')
+    first_name = serializers.ReadOnlyField(source='following.first_name')
+    last_name = serializers.ReadOnlyField(source='following.last_name')
     is_subscribed = serializers.SerializerMethodField(
         method_name='get_is_subscribed'
     )
@@ -97,16 +71,16 @@ class FollowingSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
         return Follow.objects.filter(
-            author=obj.author, user=request.user
+            following=obj.following, user=request.user
         ).exists()
 
     def get_recipes(self, obj):
         request = self.context.get('request')
-        recipes = obj.recipes.all()
+        recipes = Recipe.objects.filter(author=obj.following)
         recipes_limit = request.query_params.get('recipes_limit')
         if recipes_limit:
             recipes = recipes[:int(recipes_limit)]
         return ShortRecipeSerializer(recipes, many=True).data
 
     def get_recipes_count(self, obj):
-        return obj.recipes.count()
+        return Recipe.objects.filter(author=obj.following).count()

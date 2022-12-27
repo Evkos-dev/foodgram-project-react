@@ -1,14 +1,15 @@
-from api.filters import IngredientFilter, RecipeFilter
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
-                            ShoppingList, Tag)
-from rest_framework import mixins, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.validators import ValidationError
+
+from api.filters import IngredientFilter, RecipeFilter
+from recipes.models import (Favorite, Ingredient, IngredientAmount, Recipe,
+                            ShoppingCart, Tag)
 
 from .pagination import CustomPagination
 from .permissions import IsAuthorOrReadOnly
@@ -18,23 +19,17 @@ from .serializers import (AddRecipeSerializer, IngredientSerializer,
 from .utils import convert_txt
 
 
-class CreateDestroyViewSet(
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
-):
-    pass
-
-
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (AllowAny,)
+    pagination_class = None
 
 
-class IngredientViewSet(viewsets.ModelViewSet):
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    pagination_class = None
     permission_classes = (AllowAny,)
     filterset_class = IngredientFilter
 
@@ -69,9 +64,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         detail=False,
         permission_classes=(IsAuthenticated,)
     )
-    def download_shopping_list(self, request):
+    def download_shopping_cart(self, request):
         ingredients = IngredientAmount.objects.filter(
-            recipe__shopping_list__user=request.user
+            recipe__shopping_cart__user=request.user
         ).values(
             'ingredient__name', 'ingredient__measurement_unit'
         ).order_by(
@@ -84,10 +79,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         methods=('post', 'delete'),
         permission_classes=(IsAuthenticated,)
     )
-    def shopping_list(self, request, pk):
+    def shopping_cart(self, request, pk):
         if request.method == 'POST':
-            return self.add_recipe(ShoppingList, request, pk)
-        return self.delete_recipe(ShoppingList, request, pk)
+            return self.add_recipe(ShoppingCart, request, pk)
+        return self.delete_recipe(ShoppingCart, request, pk)
 
     def add_recipe(self, model, request, pk):
         recipe = get_object_or_404(Recipe, pk=pk)

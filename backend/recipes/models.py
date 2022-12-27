@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+
 from users.models import User
 
 
@@ -108,17 +109,17 @@ class Favorite(models.Model):
         ]
 
 
-class ShoppingList(models.Model):
+class ShoppingCart(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='shopping_list',
+        related_name='shopping_cart',
         verbose_name='Список покупок'
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='in_shopping_list',
+        related_name='shopping_cart',
         verbose_name='В списке покупок'
     )
 
@@ -129,3 +130,6 @@ class ShoppingList(models.Model):
                 name='unique_recipe'
             )
         ]
+
+    def __str__(self):
+        return f'{self.user} добавил {self.recipe} в список покупок'
