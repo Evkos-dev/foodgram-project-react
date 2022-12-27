@@ -1,1 +1,4 @@
-# praktikum_new_diplom
+Сайт доступен по ip: http://158.160.21.151/
+Для админки: 
+логин: admin@admin.ru
+пароль: admin
