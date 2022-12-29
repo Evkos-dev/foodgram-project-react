@@ -4,6 +4,8 @@ from django.http import HttpResponse
 def convert_txt(shop_cart):
     file_name = 'shopping_cart.txt'
     shopping_cart = []
+    shopping_cart.append('Спасибо, что пользуетесь Foodgram.')
+    shopping_cart.append('Ваш сводный список ингредиентов для покупки:')
     for ing in shop_cart:
         name = ing['ingredient__name']
         measurement_unit = ing['ingredient__measurement_unit']

@@ -1,11 +1,22 @@
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
 from users.models import User
 
 
 class Tag(models.Model):
-    name = models.TextField(max_length=200, unique=True)
-    color = models.CharField(max_length=7)
+    name = models.TextField(
+        max_length=200,
+        unique=True,
+        validators=[
+            RegexValidator(regex=r'^(Завтрак|Обед|Ужин)$')
+        ]
+    )
+    color = models.CharField(
+        max_length=7,
+        validators=[
+            RegexValidator(regex=r'^(#E26C2D|#49B64E|#8775D2)$')
+        ]
+    )
     slug = models.SlugField(max_length=200, unique=True)
 
 

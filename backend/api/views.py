@@ -8,7 +8,6 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.validators import ValidationError
 
 from .pagination import CustomPagination
 from .permissions import IsAuthorOrReadOnly
@@ -56,8 +55,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def favorite(self, request, pk=None):
         if request.method == 'POST':
-            return self.add_recipe(Favorite, request, pk)
-        return self.delete_recipe(Favorite, request, pk)
+            return self._add_recipe(Favorite, request, pk)
+        return self._delete_recipe(Favorite, request, pk)
 
     @action(
         detail=False,
@@ -80,19 +79,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def shopping_cart(self, request, pk):
         if request.method == 'POST':
-            return self.add_recipe(ShoppingCart, request, pk)
-        return self.delete_recipe(ShoppingCart, request, pk)
+            return self._add_recipe(ShoppingCart, request, pk)
+        return self._delete_recipe(ShoppingCart, request, pk)
 
-    def add_recipe(self, model, request, pk):
+    def _add_recipe(self, model, request, pk):
         recipe = get_object_or_404(Recipe, pk=pk)
         user = self.request.user
-        if model.objects.filter(recipe=recipe, user=user).exists():
-            raise ValidationError('Рецепт уже добавлен')
         model.objects.create(recipe=recipe, user=user)
         serializer = ShortRecipeSerializer(recipe)
         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
-    def delete_recipe(self, model, request, pk):
+    def _delete_recipe(self, model, request, pk):
         recipe = get_object_or_404(Recipe, pk=pk)
         user = self.request.user
         obj = get_object_or_404(model, recipe=recipe, user=user)
