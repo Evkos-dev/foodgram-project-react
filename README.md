@@ -128,7 +128,10 @@ docker-compose exec web python manage.py import_tags tags.csv
 `docker-compose stop`
 
 Проект доступен по адресу:
-`http:///`
+`http://84.201.167.241/`
+
+Для админки: admin@admin.ru
+password: admin
 
 [![CI](https://github.com/Evkos-dev/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg?branch=master)](https://github.com/Evkos-dev/foodgram-project-react/actions/workflows/foodgram_workflow.yml)
 
