@@ -96,17 +96,16 @@ class AddRecipeSerializer(serializers.ModelSerializer):
         many=True
     )
     ingredients = AddIngredientSerializer(many=True)
-    image = Base64ImageField(max_length=None)
+    image = Base64ImageField()
 
-    def _to_representation(self, instance):
+    def to_representation(self, instance):
         serializer = RecipeSerializer(instance)
         return serializer.data
 
-    @transaction.atomic
     def create_ingredients(self, ingredients, recipe):
         for ingredient in ingredients:
-            amount = ingredient['amount']
-            ingredient = ingredient['id']
+            amount = ingredient.get('amount')
+            ingredient = ingredient.get('id')
             ingredients, created = IngredientAmount.objects.get_or_create(
                 recipe=recipe,
                 ingredient=ingredient,
@@ -134,19 +133,19 @@ class AddRecipeSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def validate(self, data):
-        ingredients = data['ingredients']
-        if not ingredients:
+        ingredients = data.get('ingredients')
+        if ingredients is None:
             raise serializers.ValidationError(
                 'Поле с ингредиентами не может быть пустым'
             )
         unique_ingredients = []
         for ingredient in ingredients:
-            name = ingredient['id']
-            if int(ingredient['amount']) <= 0:
+            name = ingredient.get('id')
+            if int(ingredient.get('amount')) <= 0:
                 raise serializers.ValidationError(
                     f'Не корректное количество для {name}'
                 )
-            if not isinstance(ingredient['amount'], int):
+            if not isinstance(ingredient.get('amount'), int):
                 raise serializers.ValidationError(
                     'Количество ингредиентов должно быть целым числом'
                 )
