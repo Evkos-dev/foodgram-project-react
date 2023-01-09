@@ -127,7 +127,12 @@ docker-compose exec web python manage.py import_tags tags.csv
 Остановить контейнер:
 `docker-compose stop`
 
-#Проект в данный момент не доступен на сервере, срок использования Я.К кончился.
+Проект доступен по адресу:
+`http://158.160.21.182/`
+
+Для входа в админку:
+Логин: admin@admin.ru
+Пароль: admin
 
 [![CI](https://github.com/Evkos-dev/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg?branch=master)](https://github.com/Evkos-dev/foodgram-project-react/actions/workflows/foodgram_workflow.yml)
 
